@@ -1,4 +1,4 @@
-public class Infant extends Person{
+public class Infant extends Person implements Mover {
   static class Toys{
     private String infantToyName;
     private int infantToyRating;
@@ -86,5 +86,47 @@ public class Infant extends Person{
       }
     }
     return maxRating;
+  }
+
+  @Override
+  public double metabolizeAcculumatedCalories(){
+    double weightGain = 0.0;
+    int calories = getCaloriesAccumulator();
+    while (calories - 1200 >= 0) {
+      weightGain++;
+    }
+    return weightGain;
+  }
+
+  @Override
+  public String move() {
+    return "flail arms and legs";
+  }
+
+  @Override
+  public String move(int times) {
+    String s = "";
+    if (times > 0) {
+      for (int i = 0; i < times; i++) {
+        s += "flail arms and legs\n";
+      }
+    }
+    return s;
+  }
+
+  @Override
+  public void eat(Food food) {
+    this.setCaloriesConsumed(food.getCalories() + this.getCaloriesConsumed());
+    this.setCaloriesAccumulator(food.getCalories() + this.getCaloriesAccumulator());
+  }
+
+  @Override
+  public void eat(Food[] food) {
+    int calories = 0;
+    for (Food a : food) {
+      calories += a.getCalories();
+    }
+    this.setCaloriesConsumed(this.getCaloriesConsumed() + calories);
+    this.setCaloriesAccumulator(this.getCaloriesAccumulator() + calories);
   }
 }
