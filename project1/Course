@@ -1,0 +1,84 @@
+public class Course {
+  private boolean isGraduateCourse;
+  private int courseNum;
+  private String courseDept;
+  private int numCredits;
+
+  public Course() {
+    this.isGraduateCourse = false;
+    this.courseNum = 0;
+    this.courseDept = "";
+    this.numCredits = 0;
+  }
+
+  public Course(boolean isGraduateCourse, int courseNum, String courseDept, int numCredits) {
+    this.isGraduateCourse = isGraduateCourse;
+    this.courseNum = courseNum;
+    this.courseDept = courseDept;
+    this.numCredits = numCredits;
+  }
+
+  public boolean isGraduateCourse() {
+    return this.isGraduateCourse;
+  }
+
+  public int getCourseNum() {
+    return this.courseNum;
+  }
+
+  public void setCourseNum(int courseNum) {
+    this.courseNum = courseNum;
+  }
+
+  public String getCourseDept() {
+    return this.courseDept;
+  }
+
+  public void setCourseDept(String courseDept) {
+    this.courseDept = courseDept;
+  }
+
+  public int getNumCredits() {
+    return this.numCredits;
+  }
+
+  public void setNumCredits(int numCredits) {
+    this.numCredits = numCredits;
+  }
+
+  public String getCourseName() {
+    if (isGraduateCourse) {
+      return "G" + courseDept + courseNum;
+    }
+    return "U" + courseDept + courseNum;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Course) {
+      Course a = (Course)o;
+      if (a.isGraduateCourse == this.isGraduateCourse && a.courseNum == this.courseNum && a.courseDept == this.courseDept && a.numCredits == this.numCredits) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    if (isGraduateCourse) {
+      return String.format("Course: %3s-%3d | Number of Credits: %02d | Graduate", courseDept, courseNum, numCredits);
+    }
+    return String.format("Course: %3s-%3d | Number of Credits: %02d | Undergraduate", courseDept, courseNum, numCredits);
+  }
+
+  public int compareTo(Course c) {
+    if (c.courseNum > this.courseNum) {
+      return -1;
+    }
+    if (c.courseNum < this.courseNum) {
+      return 1;
+    }
+    return 0;
+  }
+}
