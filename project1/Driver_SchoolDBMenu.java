@@ -1,14 +1,11 @@
 package project;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Scanner;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import static java.lang.Integer.parseInt;
 
-public class Driver_SchoolDBMenu {
+public class Driver_SchoolDB {
     public static void main(String[] args) throws IOException {
         Scanner scnr = new Scanner(System.in);
         FileInputStream fileByteStream = null;
@@ -849,6 +846,54 @@ public class Driver_SchoolDBMenu {
             System.out.println("Would you like to perform an operation? If yes, type y. If no, type n");
             cont = scnr.next().charAt(0);
         }
+        System.out.println("\nCourses:");
+        for (int i = 0; i < numCourses; i++) {
+            if (courses[i] != null) {
+                System.out.println(courses[i].toString());
+            }
+        }
+        System.out.println("\nFACULTIES:");
+        for (int i = 0; i < numFaculties; i++) {
+            System.out.println(faculties[i].toString());
+        }
+        System.out.println("\nGENERAL STAFF:");
+        for (int i = 0; i < numGeneralStaffs; i++) {
+            System.out.println(generalStaffs[i].toString());
+        }
+        System.out.println("\nSTUDENTS:");
+        for (int i = 0; i < numStudents; i++) {
+            System.out.println(students[i].toString());
+        }
+
+        FileOutputStream fileStream = null;
+        PrintWriter outFS = null;
+
+        fileStream = new FileOutputStream("SchoolDB_Updated.txt");
+        outFS = new PrintWriter(fileStream);
+
+        outFS.println("FACULTY:");
+        for (int i = 0; i < numFaculties; i++) {
+            outFS.println(faculties[i].toString());
+        }
+        outFS.println();
+        outFS.println("STUDENTS:");
+        for (int i = 0; i < numStudents; i++) {
+            outFS.println(students[i].toString());
+        }
+        outFS.println();
+        outFS.println("GENERAL STAFF:");
+        for (int i = 0; i < numGeneralStaffs; i++) {
+            outFS.println(generalStaffs[i].toString());
+        }
+        outFS.println();
+        outFS.println("COURSES:");
+        for (int i = 0; i < numCourses; i++) {
+            if (courses[i] != null)
+            outFS.println(courses[i].toString());
+        }
+        outFS.flush();
+
+        fileStream.close();
     }
 }
 
