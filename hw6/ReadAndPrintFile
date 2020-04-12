@@ -1,0 +1,29 @@
+import java.io.*;
+import java.util.Scanner;
+
+public class ReadAndPrintFile{
+  public static void main(String[] args) throws FileNotFoundException{
+    Scanner scnr = new Scanner(System.in);
+    FileInputStream fileByteStream = null;
+    Scanner inFS = null;
+    char cont = 'y';
+
+    while (cont == 'y') {
+      System.out.println("What is the name of your file?");
+      String userFile = scnr.next();
+
+      try {
+        fileByteStream = new FileInputStream(userFile);
+        inFS = new Scanner(fileByteStream);
+
+        while (inFS.hasNextLine()) {
+          System.out.println(inFS.nextLine());
+        }
+        cont = 'n';
+      }
+      catch (Exception FileNotFoundException){
+        System.out.println("File Not Found " + userFile);
+      }
+    }
+  }
+}
