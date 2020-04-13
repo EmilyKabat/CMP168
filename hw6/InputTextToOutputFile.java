@@ -1,3 +1,5 @@
+// package hw6;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -9,15 +11,20 @@ public class InputTextToOutputFile{
 
 			 System.out.println("What is the name of your output file?");
 			 if (scnr.hasNext()) {
-					 userFile = scnr.nextLine().replace(" ",  "");
+					 userFile = scnr.nextLine();
 			 }
 			 try {
 					 String s = "";
 					 FileWriter fileWriter = new FileWriter(userFile);
-					 if (scnr.nextLine().contains("STOP!")) {
-						 s += scnr.nextLine();
-						 s += "\n";
+					 boolean c = true;
+					 while (c) {
+							 s += scnr.nextLine();
+							 s+="\n";
+							 if (scnr.nextLine().contains("STOP!")) {
+									 c = false;
+							 }
 					 }
+					 // System.out.println(s);
 					 fileWriter.write(s);
 					 fileWriter.close();
 					 cont = 'n';
