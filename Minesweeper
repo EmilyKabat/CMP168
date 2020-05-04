@@ -1,3 +1,5 @@
+package project;
+
 import java.lang.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -167,16 +169,22 @@ public class Grid {
                     dig.setVisible(false);
                 }
                 appFrame.add(dig);
+                JButton bomb = new JButton("You lost. Would you like to play again?");
+                bomb.setBounds(bombGrid.numColumns * 50 + 10, 0, 140, 200);
+                bomb.setVisible(false);
+                appFrame.add(bomb);
                 dig.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        JButton bomb = new JButton("Dig Here");
-                        bomb.setBounds(120, 120, 50, 50);
-                        bomb.setVisible(true);
-                        if (bombGrid2.bombGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]) {
+                        int numClicks = 0;
+                        if (bombGrid.bombGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]) {
                             dig.setText("Bomb");
-                            appFrame.add(bomb);
+                            bomb.setVisible(true);
+                            if (numClicks == 0) {
+//                               // figure out how to make the first click one you can't die on
+                            }
                         } else {
-                            dig.setText(Integer.toString(bombGrid2.countGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]));
+                            numClicks++;
+                            dig.setText(Integer.toString(bombGrid.countGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]));
                         }
                     }
                 });
