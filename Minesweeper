@@ -1,0 +1,188 @@
+import java.lang.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+
+public class Grid {
+    private boolean[][] bombGrid;
+    private int[][] countGrid;
+    private int numRows;
+    private int numColumns;
+    private int numBombs;
+
+    public void Grid() {
+        this.numRows = 10;
+        this.numColumns = 10;
+        this.bombGrid = new boolean[10][10];
+        this.countGrid = new int[10][10];
+        this.numBombs = 25;
+        createBombGrid();
+        createCountGrid();
+    }
+
+    public void Grid(int rows, int columns) {
+        this.numRows = rows;
+        this.numColumns = columns;
+        this.bombGrid = new boolean[rows][columns];
+        this.countGrid = new int[rows][columns];
+        this.numBombs = 25;
+        createBombGrid();
+        createCountGrid();
+    }
+
+    public void Grid(int rows, int columns, int numBombs) {
+        this.numRows = rows;
+        this.numColumns = columns;
+        this.bombGrid = new boolean[rows][columns];
+        this.countGrid = new int[rows][columns];
+        this.numBombs = numBombs;
+        createBombGrid();
+        createCountGrid();
+    }
+
+    public void createBombGrid() {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                bombGrid[i][j] = false;
+            }
+        }
+        for (int i = 0; i < numBombs; i++) {
+            int rand1 = (int) (Math.random() * 10);
+            int rand2 = (int) (Math.random() * 10);
+            if (rand1 < numRows && rand2 < numColumns) {
+                if (bombGrid[rand1][rand2]) {
+                    i--;
+                } else {
+                    bombGrid[rand1][rand2] = true;
+                }
+            }
+            else {
+                i--;
+            }
+        }
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                System.out.print(bombGrid[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public int getCountAtLocation(int row, int column) {
+        int bombCount = 0;
+        if (row > 0 && column < numColumns - 1 && bombGrid[row - 1][column + 1] == true) {
+            bombCount++;
+        }
+        if (column < numColumns - 1 && bombGrid[row][column + 1] == true) {
+            bombCount++;
+        }
+        if (row < numRows - 1 && column < numColumns - 1 && bombGrid[row + 1][column + 1] == true) {
+            bombCount++;
+        }
+        if (row > 0 && bombGrid[row - 1][column] == true) {
+            bombCount++;
+        }
+        if (bombGrid[row][column] == true) {
+            bombCount++;
+        }
+        if (row < numRows - 1 && bombGrid[row + 1][column] == true) {
+            bombCount++;
+        }
+        if (row > 0 && column > 0 && bombGrid[row - 1][column - 1] == true) {
+            bombCount++;
+        }
+        if (column > 0 && bombGrid[row][column - 1] == true) {
+            bombCount++;
+        }
+        if (row < numRows - 1 && column > 0 && bombGrid[row + 1][column - 1] == true) {
+            bombCount++;
+        }
+        return bombCount;
+    }
+
+    public void createCountGrid() {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                countGrid[i][j] = getCountAtLocation(i, j);
+                System.out.print(countGrid[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public int getNumRows() {
+        return this.numRows;
+    }
+
+    public int getNumColumns() {
+        return this.numColumns;
+    }
+
+    public int getNumBombs() {
+        return this.numBombs;
+    }
+
+    public boolean[][] getBombGrid() {
+        return this.bombGrid;
+    }
+
+    public int[][] getCountGrid() {
+        return this.countGrid;
+    }
+
+    public boolean isBombAtLocation(int row, int column) {
+        return bombGrid[row][column];
+    }
+
+    public static void main(String[] args) {
+        Grid bombGrid = new Grid();
+        bombGrid.Grid();
+
+        JFrame appFrame = new JFrame();
+        appFrame.setSize(bombGrid.numColumns * 60 + 150, bombGrid.numRows * 60);
+        appFrame.setTitle("Grid");
+        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JTextField tf=new JTextField();
+        Grid bombGrid2 = new Grid();
+        bombGrid2.Grid(bombGrid.numRows + 1, bombGrid.numColumns + 1);
+        for (int i = 0; i < bombGrid.numRows; i++) {
+            for (int j = 0; j < bombGrid.numColumns; j++) {
+                bombGrid2.bombGrid[i][j] = bombGrid.bombGrid[i][j];
+            }
+        }
+        for (int i = 0; i < 11; i++) {
+            bombGrid2.bombGrid[10][i] = false;
+        }
+        for (int i = 0; i < 11; i++) {
+            bombGrid2.bombGrid[i][10] = false;
+        }
+        for (int i = 0; i < bombGrid2.numRows; i++) {
+            for (int j = 0; j < bombGrid2.numColumns; j++) {
+                JButton dig = new JButton("Dig Here");
+                dig.setBounds(i * 50, j * 50, 50, 50);
+                dig.setVisible(true);
+                if (i == bombGrid.numRows || j == bombGrid.numColumns) {
+                    dig.setVisible(false);
+                }
+                appFrame.add(dig);
+                dig.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JButton bomb = new JButton("Dig Here");
+                        bomb.setBounds(120, 120, 50, 50);
+                        bomb.setVisible(true);
+                        if (bombGrid2.bombGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]) {
+                            dig.setText("Bomb");
+                            appFrame.add(bomb);
+                        } else {
+                            dig.setText(Integer.toString(bombGrid2.countGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]));
+                        }
+                    }
+                });
+            }
+        }
+        appFrame.setVisible(true);
+    }
+
+}
