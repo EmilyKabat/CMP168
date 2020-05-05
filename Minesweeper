@@ -144,7 +144,7 @@ public class Grid {
 
     public static void main(String[] args) {
         Grid bombGrid = new Grid();
-        bombGrid.Grid(5, 5, 3);
+        bombGrid.Grid(14, 14, 40);
 
         JFrame appFrame = new JFrame();
         appFrame.setSize(bombGrid.numColumns * 60 + 150, bombGrid.numRows * 60);
