@@ -6,6 +6,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import java.applet.Applet;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.event.*;
 
 public class Grid {
     private boolean[][] bombGrid;
@@ -140,7 +144,7 @@ public class Grid {
 
     public static void main(String[] args) {
         Grid bombGrid = new Grid();
-        bombGrid.Grid();
+        bombGrid.Grid(5, 5, 3);
 
         JFrame appFrame = new JFrame();
         appFrame.setSize(bombGrid.numColumns * 60 + 150, bombGrid.numRows * 60);
@@ -154,15 +158,16 @@ public class Grid {
                 bombGrid2.bombGrid[i][j] = bombGrid.bombGrid[i][j];
             }
         }
-        for (int i = 0; i < 11; i++) {
-            bombGrid2.bombGrid[10][i] = false;
+        for (int i = 0; i < bombGrid2.numRows; i++) {
+            bombGrid2.bombGrid[bombGrid.numRows][i] = false;
         }
-        for (int i = 0; i < 11; i++) {
-            bombGrid2.bombGrid[i][10] = false;
+        for (int i = 0; i < bombGrid2.numColumns; i++) {
+            bombGrid2.bombGrid[i][bombGrid.numColumns] = false;
         }
+
         for (int i = 0; i < bombGrid2.numRows; i++) {
             for (int j = 0; j < bombGrid2.numColumns; j++) {
-                JButton dig = new JButton("Dig Here");
+                JButton dig = new JButton("Dig");
                 dig.setBounds(i * 50, j * 50, 50, 50);
                 dig.setVisible(true);
                 if (i == bombGrid.numRows || j == bombGrid.numColumns) {
@@ -173,18 +178,32 @@ public class Grid {
                 bomb.setBounds(bombGrid.numColumns * 50 + 10, 0, 140, 200);
                 bomb.setVisible(false);
                 appFrame.add(bomb);
+                int numToWin = 0;
                 dig.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        int numClicks = 0;
                         if (bombGrid.bombGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]) {
                             dig.setText("Bomb");
                             bomb.setVisible(true);
-                            if (numClicks == 0) {
-//                               // figure out how to make the first click one you can't die on
-                            }
-                        } else {
-                            numClicks++;
+                            dig.setBackground(Color.RED);
+                            dig.setOpaque(true);
+//                            if (numClicks == 0) {
+//                               figure out how to make the first click one you can't die on
+//                            }
+                        }
+                        else {
+//                            System.out.println(numToWin);
+//                            numToWin++;
                             dig.setText(Integer.toString(bombGrid.countGrid[(int) (dig.getLocation().y / 50)][(int) (dig.getLocation().x / 50)]));
+                            dig.setBackground(Color.GREEN);
+                            dig.setOpaque(true);
+                            System.out.println(numToWin);
+                        }
+                        int a = (bombGrid.numColumns * bombGrid.numRows) - bombGrid.numBombs;
+                        System.out.println("NumToWin: " + a);
+                        System.out.println("Your number: " + numToWin);
+                        if (numToWin == (bombGrid.numColumns * bombGrid.numRows) - bombGrid.numBombs) {
+                            bomb.setVisible(true);
+                            bomb.setText("YOU WIN!!!");
                         }
                     }
                 });
