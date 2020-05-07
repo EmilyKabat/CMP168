@@ -13,6 +13,8 @@ public class Grid {
     private int numRows;
     private int numColumns;
     private int numBombs;
+    static int numToWin = 0;
+    static int numFlags = 0;
 
     public Grid() {
         this.numRows = 10;
@@ -167,7 +169,6 @@ public class Grid {
                 bomb.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
                 bomb.setVisible(false);
                 appFrame.add(bomb);
-                int numToWin = 0;
                 label.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         ImageIcon redFlag = new ImageIcon("redflag.png");
@@ -176,8 +177,9 @@ public class Grid {
                         flag.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
                         flag.setVisible(true);
                         appFrame.add(flag);
-                        System.out.println("Label clicked");
                         label.setVisible(false);
+                        numFlags++;
+                        System.out.println("Number of mines identified: " + numFlags + "/" + bombGrid.getNumBombs());
                         flag.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 flag.setVisible(false);
@@ -191,15 +193,19 @@ public class Grid {
                                     dig.setVisible(true);
                                     dig.setBackground(Color.RED);
                                     dig.setOpaque(true);
+                                    bomb.setVisible(true);
                                 } else {
+                                    numToWin++;
+                                    numFlags--;
                                     dig.setText(Integer.toString(bombGrid.getCountAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))));
                                     dig.setBackground(Color.GREEN);
                                     dig.setOpaque(true);
-                                    System.out.println(numToWin);
+                                    System.out.println("NumToWin = " + numToWin);
+                                    if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs()) {
+                                        bomb.setText("YOU WIN!!!");
+                                    }
                                 }
                                 int a = (bombGrid.getNumColumns() * bombGrid.getNumRows()) - bombGrid.getNumBombs();
-                                System.out.println("NumToWin: " + a);
-                                System.out.println("Your number: " + numToWin);
                                 if (numToWin == (bombGrid.getNumColumns() * bombGrid.getNumRows()) - bombGrid.getNumBombs()) {
                                     bomb.setVisible(true);
                                     bomb.setText("YOU WIN!!!");
