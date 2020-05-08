@@ -148,14 +148,6 @@ public class Grid {
                 }
                 appFrame.add(label);
                 appFrame.setLayout(null);
-                JButton bomb = new JButton("You lost. Would you like to play again?");
-                bomb.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
-                bomb.setVisible(false);
-                appFrame.add(bomb);
-                JButton win = new JButton("YOU WIN!!!");
-                win.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
-                win.setVisible(false);
-                appFrame.add(win);
                 label.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         ImageIcon redFlag = new ImageIcon("redflag.png");
@@ -184,10 +176,15 @@ public class Grid {
                                         dig.setOpaque(true);
                                         JFrame mainFrame = new JFrame("Java Swing Examples");
                                         mainFrame.setSize(400,400);
-                                        JOptionPane.showMessageDialog(mainFrame, "A basic JOptionPane message dialog");
-                                        lost++;
+                                        JFrame f;
+                                        f=new JFrame();
+                                        int input = JOptionPane.showOptionDialog(null, "You lost. Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                                        if(input == JOptionPane.OK_OPTION)
+                                        {
+                                            appFrame.setVisible(false);
+                                            createGame();
+                                        }
                                     } else {
-                                        numToWin++;
                                         numFlags--;
                                         dig.setText(Integer.toString(bombGrid.getCountAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))));
                                         dig.setBackground(Color.GREEN);
@@ -196,7 +193,14 @@ public class Grid {
                                         if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs()) {
                                             JFrame mainFrame = new JFrame("Java Swing Examples");
                                             mainFrame.setSize(400,400);
-                                            JOptionPane.showMessageDialog(mainFrame, "A basic JOptionPane message dialog");
+                                            JFrame f;
+                                            f=new JFrame();
+                                            int input = JOptionPane.showOptionDialog(null, "You won! Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                                            if(input == JOptionPane.OK_OPTION)
+                                            {
+                                                appFrame.setVisible(false);
+                                                createGame();
+                                            }
                                             numWins++;
                                         }
                                     }
@@ -209,12 +213,6 @@ public class Grid {
         }
         appFrame.setVisible(true);
 
-    }
-
-    JFrame f;
-    public void OptionPaneExample(){
-        f=new JFrame();
-        JOptionPane.showMessageDialog(f,"Hello, Welcome to Javatpoint.");
     }
 
     public static void main(String[] args) {
