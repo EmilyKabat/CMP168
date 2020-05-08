@@ -14,7 +14,8 @@ public class Grid {
     private int numColumns;
     private int numBombs;
     static int numToWin = 0;
-    static int numFlags = 0;
+    static int numFlags = -1;
+    static int lost = 0;
 
     public Grid() {
         this.numRows = 10;
@@ -61,12 +62,6 @@ public class Grid {
                 bombGrid[rand1][rand2] = true;
             }
         }
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numColumns; j++) {
-                System.out.print(bombGrid[i][j] + " ");
-            }
-            System.out.println();
-        }
     }
 
     public int getCountAtLocation(int row, int column) {
@@ -105,9 +100,7 @@ public class Grid {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
                 countGrid[i][j] = getCountAtLocation(i, j);
-                System.out.print(countGrid[i][j] + " ");
             }
-            System.out.println();
         }
     }
 
@@ -142,78 +135,72 @@ public class Grid {
         appFrame.setTitle("Grid");
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JTextField tf=new JTextField();
-//        Grid bombGrid2 = new Grid(bombGrid.getNumRows() + 1, bombGrid.getNumColumns() + 1);
-//        for (int i = 0; i < bombGrid.getNumRows(); i++) {
-//            for (int j = 0; j < bombGrid.getNumColumns(); j++) {
-//                bombGrid2.bombGrid[i][j] = bombGrid.bombGrid[i][j];
-//            }
-//        }
-//        for (int i = 0; i < bombGrid2.getNumRows(); i++) {
-//            bombGrid2.bombGrid[bombGrid.getNumRows()][i] = false;
-//        }
-//        for (int i = 0; i < bombGrid2.getNumColumns(); i++) {
-//            bombGrid2.bombGrid[i][bombGrid.getNumColumns()] = false;
-//        }
-
-        for (int i = 0; i < bombGrid.getNumRows(); i++) {
-            for (int j = 0; j < bombGrid.getNumColumns(); j++) {
-                JButton label = new JButton("Dig");
-                label.setBounds(i * 50, j * 50, 50, 50);
-                label.setVisible(true);
-                if (i == bombGrid.getNumRows() || j == bombGrid.getNumColumns()) {
-                    label.setVisible(false);
-                }
-                appFrame.add(label);
-                appFrame.setLayout(null);
-                JButton bomb = new JButton("You lost. Would you like to play again?");
-                bomb.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
-                bomb.setVisible(false);
-                appFrame.add(bomb);
-                label.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        ImageIcon redFlag = new ImageIcon("redflag.png");
-                        JButton flag = new JButton(redFlag);
-                        flag.setIcon(redFlag);
-                        flag.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
-                        flag.setVisible(true);
-                        appFrame.add(flag);
+        Boolean playAgain = true;
+        while (playAgain) {
+            for (int i = 0; i < bombGrid.getNumRows(); i++) {
+                for (int j = 0; j < bombGrid.getNumColumns(); j++) {
+                    JButton label = new JButton();
+                    label.setBounds(i * 50, j * 50, 50, 50);
+                    label.setVisible(true);
+                    if (i == bombGrid.getNumRows() || j == bombGrid.getNumColumns()) {
                         label.setVisible(false);
-                        numFlags++;
-                        System.out.println("Number of mines identified: " + numFlags + "/" + bombGrid.getNumBombs());
-                        flag.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                flag.setVisible(false);
-                                JButton dig = new JButton();
-                                dig.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
-                                dig.setVisible(true);
-                                appFrame.add(dig);
-                                dig.setVisible(true);
-                                if (bombGrid.isBombAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))) {
-                                    dig.setText("Bomb");
-                                    dig.setVisible(true);
-                                    dig.setBackground(Color.RED);
-                                    dig.setOpaque(true);
-                                    bomb.setVisible(true);
-                                } else {
-                                    numToWin++;
-                                    numFlags--;
-                                    dig.setText(Integer.toString(bombGrid.getCountAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))));
-                                    dig.setBackground(Color.GREEN);
-                                    dig.setOpaque(true);
-                                    System.out.println("NumToWin = " + numToWin);
-                                    if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs()) {
-                                        bomb.setText("YOU WIN!!!");
-                                    }
-                                }
-                                int a = (bombGrid.getNumColumns() * bombGrid.getNumRows()) - bombGrid.getNumBombs();
-                                if (numToWin == (bombGrid.getNumColumns() * bombGrid.getNumRows()) - bombGrid.getNumBombs()) {
-                                    bomb.setVisible(true);
-                                    bomb.setText("YOU WIN!!!");
-                                }
-                            }
-                        });
                     }
-                });
+                    appFrame.add(label);
+                    appFrame.setLayout(null);
+                    JButton bomb = new JButton("You lost. Would you like to play again?");
+                    bomb.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
+                    bomb.setVisible(false);
+                    appFrame.add(bomb);
+                    JButton win = new JButton("YOU WIN!!!");
+                    win.setBounds(bombGrid.getNumColumns() * 50 + 10, 0, 140, 200);
+                    win.setVisible(false);
+                    appFrame.add(win);
+                    label.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            ImageIcon redFlag = new ImageIcon("redflag.png");
+                            JButton flag = new JButton(redFlag);
+                            flag.setIcon(redFlag);
+                            flag.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
+                            flag.setVisible(true);
+                            if (lost == 0) {
+                                appFrame.add(flag);
+                                label.setVisible(false);
+                            }
+                            numFlags++;
+                            System.out.println("Number of mines identified: " + numFlags + "/" + bombGrid.getNumBombs());
+                            if (lost == 0) {
+                                flag.addActionListener(new ActionListener() {
+                                    public void actionPerformed(ActionEvent e) {
+                                        flag.setVisible(false);
+                                        JButton dig = new JButton();
+                                        dig.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
+                                        dig.setVisible(true);
+                                        appFrame.add(dig);
+                                        if (bombGrid.isBombAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))) {
+                                            dig.setText("Bomb");
+                                            dig.setVisible(true);
+                                            dig.setBackground(Color.RED);
+                                            dig.setOpaque(true);
+                                            bomb.setVisible(true);
+                                            lost++;
+                                        } else {
+                                            numToWin++;
+                                            numFlags--;
+                                            dig.setText(Integer.toString(bombGrid.getCountAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))));
+                                            dig.setBackground(Color.GREEN);
+                                            dig.setOpaque(true);
+                                            System.out.println("NumToWin = " + numToWin);
+                                            if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs()) {
+                                                System.out.println("YOU WIN!!!");
+                                                win.setVisible(true);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
             }
         }
         appFrame.setVisible(true);
