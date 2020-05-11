@@ -12,11 +12,12 @@ import javax.swing.*;
 public class Gui extends Grid {
     public static int lost;
     public static boolean[][] revealedCells;
+    public static int gameOver = 0;
     public static void zeroCell(int row, int column, Grid bombGrid, JFrame appFrame) {
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                 if (!(i == 0 && j == 0) && row + i >= 0 && row + i < bombGrid.getNumRows() && column + j >= 0 && column + j < bombGrid.getNumColumns() && !revealedCells[row + i][column + j]) {
-                    JButton circaZero = new JButton();
+                    JButton circaZero = new JButton(Integer.toString(bombGrid.getCountAtLocation(row + i, column + j)));
                     circaZero.setBounds((row + i) * 50, (column + j) * 50, 50, 50);
                     revealCell(circaZero, appFrame, bombGrid);
                 }
@@ -35,17 +36,33 @@ public class Gui extends Grid {
         dig.setVisible(true);
         appFrame.add(dig);
         if (bombGrid.isBombAtLocation((row), column)) {
+            gameOver = 1;
             lost++;
             dig.setText("Bomb");
             dig.setVisible(true);
             dig.setBackground(Color.RED);
             dig.setOpaque(true);
-            JFrame mainFrame = new JFrame("Game Over");
-            mainFrame.setSize(400, 400);
-            int input = JOptionPane.showOptionDialog(null, "You lost. Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-            if (input == JOptionPane.OK_OPTION) {
-                appFrame.setVisible(false);
-                createGame();
+            for (int i = 0; i < bombGrid.getNumRows(); i++) {
+                for (int j = 0; j < bombGrid.getNumColumns(); j++) {
+                    if (!revealedCells[i][j]) {
+                        JButton btn = new JButton();
+                        btn.setBounds(i * 50, j * 50, 50, 50);
+                        revealCell(btn, appFrame, bombGrid);
+                    }
+                }
+            }
+            if (gameOver == 1) {
+                gameOver++;
+                JFrame mainFrame = new JFrame("Game Over");
+                mainFrame.setSize(400, 400);
+                int input = JOptionPane.showOptionDialog(null, "You lost. Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                if (input == JOptionPane.OK_OPTION) {
+                    appFrame.setVisible(false);
+                    createGame();
+                }
+                if (input == JOptionPane.CANCEL_OPTION) {
+                    appFrame.setVisible(false);
+                }
             }
         }
         else {
@@ -55,7 +72,6 @@ public class Gui extends Grid {
             dig.setBackground(Color.GREEN);
             dig.setOpaque(true);
             if (bombGrid.getCountAtLocation(row, column) == 0) {
-                dig.setText(a);
                 zeroCell(row, column, bombGrid, appFrame);
             }
             if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs() && lost == 0) {
