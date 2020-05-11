@@ -1,212 +1,117 @@
+package project;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.*;
 
-public class Grid {
-    private boolean[][] bombGrid;
-    private int[][] countGrid;
-    private int numRows;
-    private int numColumns;
-    private int numBombs;
-    static int numToWin = 0;
-    static int numFlags = -1;
-    static int lost = 0;
-    static boolean playAgain = true;
-    static int numWins = 0;
-
-    public Grid() {
-        this.numRows = 10;
-        this.numColumns = 10;
-        this.bombGrid = new boolean[10][10];
-        this.countGrid = new int[10][10];
-        this.numBombs = 25;
-        createBombGrid();
-        createCountGrid();
-    }
-
-    public Grid(int rows, int columns) {
-        this.numRows = rows;
-        this.numColumns = columns;
-        this.bombGrid = new boolean[rows][columns];
-        this.countGrid = new int[rows][columns];
-        this.numBombs = 25;
-        createBombGrid();
-        createCountGrid();
-    }
-
-    public Grid(int rows, int columns, int numBombs) {
-        this.numRows = rows;
-        this.numColumns = columns;
-        this.bombGrid = new boolean[rows][columns];
-        this.countGrid = new int[rows][columns];
-        this.numBombs = numBombs;
-        createBombGrid();
-        createCountGrid();
-    }
-
-    public void createBombGrid() {
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numColumns; j++) {
-                bombGrid[i][j] = false;
-            }
-        }
-        for (int i = 0; i < numBombs; i++) {
-            int rand1 = (int) (Math.random() * numRows);
-            int rand2 = (int) (Math.random() * numColumns);
-            if (bombGrid[rand1][rand2]) {
-                i--;
-            } else {
-                bombGrid[rand1][rand2] = true;
+public class Gui extends Grid {
+    public static int lost;
+    public static boolean[][] revealedCells;
+    public static void zeroCell(int row, int column, Grid bombGrid, JFrame appFrame) {
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                if (!(i == 0 && j == 0) && row + i >= 0 && row + i < bombGrid.getNumRows() && column + j >= 0 && column + j < bombGrid.getNumColumns() && !revealedCells[row + i][column + j]) {
+                    JButton circaZero = new JButton();
+                    circaZero.setBounds((row + i) * 50, (column + j) * 50, 50, 50);
+                    revealCell(circaZero, appFrame, bombGrid);
+                }
             }
         }
     }
 
-    public int getCountAtLocation(int row, int column) {
-        int bombCount = 0;
-        if (row > 0 && column < numColumns - 1 && bombGrid[row - 1][column + 1] == true) {
-            bombCount++;
-        }
-        if (column < numColumns - 1 && bombGrid[row][column + 1] == true) {
-            bombCount++;
-        }
-        if (row < numRows - 1 && column < numColumns - 1 && bombGrid[row + 1][column + 1] == true) {
-            bombCount++;
-        }
-        if (row > 0 && bombGrid[row - 1][column] == true) {
-            bombCount++;
-        }
-        if (bombGrid[row][column] == true) {
-            bombCount++;
-        }
-        if (row < numRows - 1 && bombGrid[row + 1][column] == true) {
-            bombCount++;
-        }
-        if (row > 0 && column > 0 && bombGrid[row - 1][column - 1] == true) {
-            bombCount++;
-        }
-        if (column > 0 && bombGrid[row][column - 1] == true) {
-            bombCount++;
-        }
-        if (row < numRows - 1 && column > 0 && bombGrid[row + 1][column - 1] == true) {
-            bombCount++;
-        }
-        return bombCount;
-    }
-
-    public void createCountGrid() {
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numColumns; j++) {
-                countGrid[i][j] = getCountAtLocation(i, j);
+    public static void revealCell(JButton emptyCell, JFrame appFrame, Grid bombGrid) {
+        int row = emptyCell.getLocation().x / 50;
+        int column = emptyCell.getLocation().y / 50;
+        revealedCells[row][column] = true;
+        String a = Integer.toString(bombGrid.getCountAtLocation(row, column));
+        JButton dig = new JButton(a);
+        dig.setText(a);
+        dig.setBounds(row * 50, column * 50, 50, 50);
+        dig.setVisible(true);
+        appFrame.add(dig);
+        if (bombGrid.isBombAtLocation((row), column)) {
+            lost++;
+            dig.setText("Bomb");
+            dig.setVisible(true);
+            dig.setBackground(Color.RED);
+            dig.setOpaque(true);
+            JFrame mainFrame = new JFrame("Game Over");
+            mainFrame.setSize(400, 400);
+            int input = JOptionPane.showOptionDialog(null, "You lost. Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+            if (input == JOptionPane.OK_OPTION) {
+                appFrame.setVisible(false);
+                createGame();
             }
         }
+        else {
+            numFlags--;
+            numToWin++;
+            dig.setText(a);
+            dig.setBackground(Color.GREEN);
+            dig.setOpaque(true);
+            if (bombGrid.getCountAtLocation(row, column) == 0) {
+                dig.setText(a);
+                zeroCell(row, column, bombGrid, appFrame);
+            }
+            if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs() && lost == 0) {
+                JFrame mainFrame = new JFrame("Game Over");
+                mainFrame.setSize(400,400);
+                int input = JOptionPane.showOptionDialog(null, "You won! Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                if (input == JOptionPane.OK_OPTION) {
+                    appFrame.setVisible(false);
+                    createGame();
+                }
+            }
+        }
+        dig.setVisible(true);
     }
-
-    public int getNumRows() {
-        return this.numRows;
+    public static void addFlag(JButton emptyCell, JFrame appFrame, Grid bombGrid) {
+        ImageIcon redFlag = new ImageIcon("redflag.png");
+        JButton flag = new JButton(redFlag);
+        flag.setIcon(redFlag);
+        flag.setBounds(emptyCell.getLocation().x, emptyCell.getLocation().y, 50, 50);
+        flag.setVisible(true);
+        appFrame.add(flag);
+        emptyCell.setVisible(false);
+        numFlags++;
+        flag.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                flag.setVisible(false);
+                revealCell(emptyCell, appFrame, bombGrid);
+            }
+        });
     }
-
-    public int getNumColumns() {
-        return this.numColumns;
-    }
-
-    public int getNumBombs() {
-        return this.numBombs;
-    }
-
-    public boolean[][] getBombGrid() {
-        return this.bombGrid;
-    }
-
-    public int[][] getCountGrid() {
-        return this.countGrid;
-    }
-
-    public boolean isBombAtLocation(int row, int column) {
-        return bombGrid[row][column];
-    }
-
     public static void createGame() {
+        lost = 0;
         Grid bombGrid = new Grid(14, 14, 40);
-        JFrame appFrame = new JFrame();
-        appFrame.setSize(bombGrid.getNumColumns() * 60 + 150, bombGrid.getNumRows() * 60);
-        appFrame.setTitle("Grid");
-        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JTextField tf = new JTextField();
+        revealedCells = new boolean[bombGrid.getNumColumns()][bombGrid.getNumRows()];
         for (int i = 0; i < bombGrid.getNumRows(); i++) {
             for (int j = 0; j < bombGrid.getNumColumns(); j++) {
-                JButton label = new JButton();
-                label.setBounds(i * 50, j * 50, 50, 50);
-                label.setVisible(true);
+                revealedCells[i][j] = false;
+            }
+        }
+        JFrame appFrame = new JFrame();
+        appFrame.setSize(bombGrid.getNumColumns() * 50, bombGrid.getNumRows() * 50 + 20);
+        appFrame.setTitle("MineSweeper");
+        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        for (int i = 0; i < bombGrid.getNumRows(); i++) {
+            for (int j = 0; j < bombGrid.getNumColumns(); j++) {
+                JButton emptyCell = new JButton();
+                emptyCell.setBounds(i * 50, j * 50, 50, 50);
+                emptyCell.setVisible(true);
                 if (i == bombGrid.getNumRows() || j == bombGrid.getNumColumns()) {
-                    label.setVisible(false);
+                    emptyCell.setVisible(false);
                 }
-                appFrame.add(label);
+                appFrame.add(emptyCell);
                 appFrame.setLayout(null);
-                label.addActionListener(new ActionListener() {
+                emptyCell.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        ImageIcon redFlag = new ImageIcon("redflag.png");
-                        JButton flag = new JButton(redFlag);
-                        flag.setIcon(redFlag);
-                        flag.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
-                        flag.setVisible(true);
-                        if (lost == 0) {
-                            appFrame.add(flag);
-                            label.setVisible(false);
-                        }
-                        numFlags++;
-                        System.out.println("Number of mines identified: " + numFlags + "/" + bombGrid.getNumBombs());
-                        if (lost == 0) {
-                            flag.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    flag.setVisible(false);
-                                    JButton dig = new JButton();
-                                    dig.setBounds(label.getLocation().x, label.getLocation().y, 50, 50);
-                                    dig.setVisible(true);
-                                    appFrame.add(dig);
-                                    if (bombGrid.isBombAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))) {
-                                        dig.setText("Bomb");
-                                        dig.setVisible(true);
-                                        dig.setBackground(Color.RED);
-                                        dig.setOpaque(true);
-                                        JFrame mainFrame = new JFrame("Java Swing Examples");
-                                        mainFrame.setSize(400,400);
-                                        JFrame f;
-                                        f=new JFrame();
-                                        int input = JOptionPane.showOptionDialog(null, "You lost. Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-                                        if(input == JOptionPane.OK_OPTION)
-                                        {
-                                            appFrame.setVisible(false);
-                                            createGame();
-                                        }
-                                    } else {
-                                        numFlags--;
-                                        dig.setText(Integer.toString(bombGrid.getCountAtLocation((int) (label.getLocation().y / 50), (int) (label.getLocation().x / 50))));
-                                        dig.setBackground(Color.GREEN);
-                                        dig.setOpaque(true);
-                                        System.out.println("NumToWin = " + numToWin);
-                                        if (numToWin == bombGrid.getNumColumns() * bombGrid.getNumRows() - bombGrid.getNumBombs()) {
-                                            JFrame mainFrame = new JFrame("Java Swing Examples");
-                                            mainFrame.setSize(400,400);
-                                            JFrame f;
-                                            f=new JFrame();
-                                            int input = JOptionPane.showOptionDialog(null, "You won! Would you like to play again?", "Game Over", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-                                            if(input == JOptionPane.OK_OPTION)
-                                            {
-                                                appFrame.setVisible(false);
-                                                createGame();
-                                            }
-                                            numWins++;
-                                        }
-                                    }
-                                }
-                            });
-                        }
+                        addFlag(emptyCell, appFrame, bombGrid);
                     }
                 });
             }
@@ -220,4 +125,3 @@ public class Grid {
     }
 
 }
-
